@@ -90,34 +90,32 @@ export default function Board() {
 
   return (
     <>
-      <div className="">
-        <div className="status">
-          {winner ? (
-            <>
-              <span>{player}</span>
-              <span className="status-winner"> wins!</span>
-            </>
-          ) : gameOver ? (
-            <span>It's a draw!</span>
-          ) : (
-            <span>{player} is playing...</span>
-          )}
-        </div>
-        {Array.from({ length: 3 }, (_, rowIndex) => (
-          <div key={rowIndex} className="board-row">
-            {Array.from({ length: 3 }, (_, colIndex) =>
-              renderSquare(rowIndex * 3 + colIndex)
-            )}
-          </div>
-        ))}
-        {(gameOver || winner) && (
-          <div className='status'>
-            <button onClick={restartGame} className="restart-button">
-              Restart Game
-            </button>
-          </div>
+      <div className="status">
+        {winner ? (
+          <>
+            <span>{player}</span>
+            <span className="status-winner"> wins!</span>
+          </>
+        ) : gameOver ? (
+          <span>It's a draw!</span>
+        ) : (
+          <span>{player} is playing...</span>
         )}
       </div>
+      {Array.from({ length: 3 }, (_, rowIndex) => (
+        <div key={rowIndex} className="board-row">
+          {Array.from({ length: 3 }, (_, colIndex) =>
+            renderSquare(rowIndex * 3 + colIndex)
+          )}
+        </div>
+      ))}
+      {(gameOver || winner) && (
+        <div className='status'>
+          <button onClick={restartGame} className="restart-button">
+            Restart Game
+          </button>
+        </div>
+      )}
     </>
   );
 }
