@@ -22,7 +22,7 @@ You can view the live version of the game on GitHub Pages:
     ```
 2. Navigate to the project directory:
     ```bash
-    cd repository-name
+    cd tic-tac-toe
     ```
 3. Install dependencies:
     ```bash
