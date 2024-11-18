@@ -8,54 +8,84 @@ type SquareProps = {
 };
 
 function Square({ value, handleClick, isClicked }: SquareProps) {
-  const bgColor = value === 'X' ? 'bg-teal-600' : value === 'O' ? 'bg-red-500' : 'bg-teal-400';
+  const bgColor = isClicked
+    ? value === 'X'
+      ? 'bg-teal-600'
+      : value === 'O'
+        ? 'bg-red-500'
+        : ''
+    : 'bg-gray-300 hover:bg-gray-400';
 
   return (
-    <button 
-      className={`square ${isClicked ? bgColor : 'bg-gray-300'}`} 
-      onClick={handleClick}
-    >
-      {value}
-    </button>
+    <button className={`square ${bgColor}`} onClick={handleClick}> {value} </button>
   );
+}
+
+function calculateWinner(squares: string[]): boolean {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return true; // A winner exists
+    }
+  }
+  return false; // No winner yet
 }
 
 export default function Board() {
   const [player, setPlayer] = useState('X');
   const [values, setValues] = useState(Array(9).fill(''));
   const [clicked, setClicked] = useState(Array(9).fill(false));
+  const [winner, setWinner] = useState(false); // Track if there's a winner
 
   const onCell = (i: number) => {
-    if (clicked[i]) return; // Prevent changing already clicked cells
+    if (clicked[i] || winner) return; // Disable click if cell is already clicked or game has a winner
 
-    setValues(prev => {
-      const nextValues = [...prev];
-      nextValues[i] = player;
-      return nextValues;
-    });
+    const nextValues = [...values];
+    nextValues[i] = player;
+    setValues(nextValues);
 
-    setClicked(prev => {
-      const nextClicked = [...prev];
-      nextClicked[i] = true;
-      return nextClicked;
-    });
+    const nextClicked = [...clicked];
+    nextClicked[i] = true;
+    setClicked(nextClicked);
 
-    setPlayer(prev => (prev === 'X' ? 'O' : 'X'));
+    if (calculateWinner(nextValues)) {
+      setWinner(true); // Mark that the game has a winner
+    } else {
+      setPlayer(prev => (prev === 'X' ? 'O' : 'X')); // Switch players
+    }
   };
 
   const renderSquare = (i: number) => (
-    <Square 
-      value={values[i]} 
-      handleClick={() => onCell(i)} 
-      isClicked={clicked[i]} 
+    <Square
+      value={values[i]}
+      handleClick={() => onCell(i)}
+      isClicked={clicked[i]}
     />
   );
 
   return (
     <>
+      <div className="status">
+      <span> {player} </span>
+        {winner ? (
+          <span className="status-winner">wins! </span>
+        ) : (
+          <span> is playing...</span>
+        )}
+      </div>
       {Array.from({ length: 3 }, (_, rowIndex) => (
         <div key={rowIndex} className="board-row">
-          {Array.from({ length: 3 }, (_, colIndex) => 
+          {Array.from({ length: 3 }, (_, colIndex) =>
             renderSquare(rowIndex * 3 + colIndex)
           )}
         </div>

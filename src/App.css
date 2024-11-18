@@ -1,7 +1,20 @@
+.board-container {
+  @apply flex items-center justify-center h-screen;
+}
+
 .square {
-  @apply w-12 h-12 hover:bg-teal-600 text-white font-bold border-2 border-black;
+  @apply w-12 h-12  text-white font-bold border-2 border-black;
 }
 
 .board-row {
   @apply flex space-x-0;
 }
+
+.status {
+  @apply text-lg font-bold  my-4;
+}
+
+.status-winner {
+  @apply text-green-600;
+}
+
