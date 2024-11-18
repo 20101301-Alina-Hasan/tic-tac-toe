@@ -46,9 +46,11 @@ export default function Board() {
   const [values, setValues] = useState(Array(9).fill(''));
   const [clicked, setClicked] = useState(Array(9).fill(false));
   const [winner, setWinner] = useState(false); // Track if there's a winner
+  const [gameOver, setGameOver] = useState(false); // Track if the game is over
+  const [filledCells, setFilledCells] = useState(0); // Counter to track filled cells
 
   const onCell = (i: number) => {
-    if (clicked[i] || winner) return; // Disable click if cell is already clicked or game has a winner
+    if (clicked[i] || winner || gameOver) return; // Disable click if cell is already clicked, game has a winner, or game is over
 
     const nextValues = [...values];
     nextValues[i] = player;
@@ -58,11 +60,24 @@ export default function Board() {
     nextClicked[i] = true;
     setClicked(nextClicked);
 
+    setFilledCells(prev => prev + 1); // Increment filledCells when a cell is clicked
+
     if (calculateWinner(nextValues)) {
       setWinner(true); // Mark that the game has a winner
+    } else if (filledCells + 1 === 9) {
+      setGameOver(true); // Mark the game as over if the board is full
     } else {
       setPlayer(prev => (prev === 'X' ? 'O' : 'X')); // Switch players
     }
+  };
+
+  const restartGame = () => {
+    setPlayer('X');
+    setValues(Array(9).fill(''));
+    setClicked(Array(9).fill(false));
+    setWinner(false);
+    setGameOver(false);
+    setFilledCells(0); // Reset filledCells counter
   };
 
   const renderSquare = (i: number) => (
@@ -75,21 +90,34 @@ export default function Board() {
 
   return (
     <>
-      <div className="status">
-      <span> {player} </span>
-        {winner ? (
-          <span className="status-winner">wins! </span>
-        ) : (
-          <span> is playing...</span>
-        )}
-      </div>
-      {Array.from({ length: 3 }, (_, rowIndex) => (
-        <div key={rowIndex} className="board-row">
-          {Array.from({ length: 3 }, (_, colIndex) =>
-            renderSquare(rowIndex * 3 + colIndex)
+      <div className="">
+        <div className="status">
+          {winner ? (
+            <>
+              <span>{player}</span>
+              <span className="status-winner"> wins!</span>
+            </>
+          ) : gameOver ? (
+            <span>It's a draw!</span>
+          ) : (
+            <span>{player} is playing...</span>
           )}
         </div>
-      ))}
+        {Array.from({ length: 3 }, (_, rowIndex) => (
+          <div key={rowIndex} className="board-row">
+            {Array.from({ length: 3 }, (_, colIndex) =>
+              renderSquare(rowIndex * 3 + colIndex)
+            )}
+          </div>
+        ))}
+        {(gameOver || winner) && (
+          <div className='status'>
+            <button onClick={restartGame} className="restart-button">
+              Restart Game
+            </button>
+          </div>
+        )}
+      </div>
     </>
   );
 }
